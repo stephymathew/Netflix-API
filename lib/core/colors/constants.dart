@@ -7,3 +7,17 @@ const buttoncolorWhite = Colors.white;
 const kblackcolor= Colors.black;
 const kheight=SizedBox(height: 10,);
 const kheight20 = SizedBox(height: 20,);
+
+//BorderRadius
+
+BorderRadius kradius= BorderRadius.circular(10);
+
+//iimage
+
+const kMainImage="https://www.themoviedb.org/t/p/w600_and_h900_bestv2/xwq2TALKkuCujBnUTpr57wDO61y.jpg";
+
+//textSTyle
+
+TextStyle kHometitleText= const TextStyle(
+  fontSize: 14,fontWeight: FontWeight.bold
+);
