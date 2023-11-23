@@ -27,10 +27,10 @@ class BackGroundCard extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      CustomButtonWidget(icon:Icons.add , title: 'My List',),
+                      CustomButtonWidget(icon:Icons.add , title: 'My List', iconSize: 30, textSize: 18,),
                       _PlayButton(),
                       CustomButtonWidget(icon: Icons.info,
-                       title:'info')
+                       title:'info', iconSize: 30, textSize: 18,)
                     ],
                   ),
                 ),

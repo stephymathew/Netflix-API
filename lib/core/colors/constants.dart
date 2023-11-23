@@ -7,10 +7,12 @@ const buttoncolorWhite = Colors.white;
 const kblackcolor= Colors.black;
 const kheight=SizedBox(height: 10,);
 const kheight20 = SizedBox(height: 20,);
+const kheight50 = SizedBox(height: 50,);
 
 //BorderRadius
 
 BorderRadius kradius= BorderRadius.circular(10);
+BorderRadius kradius30 = BorderRadius.circular(30);
 
 //iimage
 
