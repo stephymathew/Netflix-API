@@ -92,8 +92,7 @@ class Api {
     }
   }
 
-  static const fastLaugh =
-      "https://run.mocky.io/v3/e5b9ed99-e74a-4a1f-a624-aad618c77a85";
+  static const fastLaugh ="https://run.mocky.io/v3/e5b9ed99-e74a-4a1f-a624-aad618c77a85";
 
   Future<List<String>> getFastLaughVideoUrls() async {
     final response = await http.get(Uri.parse(fastLaugh));

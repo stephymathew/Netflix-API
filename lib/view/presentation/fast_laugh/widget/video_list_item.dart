@@ -1,96 +1,159 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:netflix_api/core/colors/constants.dart';
+import 'package:video_player/video_player.dart';
 
-class videoListItem extends StatelessWidget {
-  final int index;
-  const videoListItem({super.key, required this.index});
+ValueNotifier<bool> muteChangeNotifier = ValueNotifier(false);
+
+class VideoListItem extends StatefulWidget {
+  final String? imageUrl;
+  final String? videoUrl;
+  const VideoListItem(
+      {super.key, required this.imageUrl, required this.videoUrl});
+
+  @override
+  State<VideoListItem> createState() => _VideoListItemState();
+}
+
+class _VideoListItemState extends State<VideoListItem> {
+  late VideoPlayerController _controller;
+  bool isPlay = true;
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!))
+      ..initialize().then((_) {
+        setState(() {
+          _controller.play();
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Container(
-          color: Colors.accents[index % Colors.accents.length],
-        ),
-        Align(
-          alignment: Alignment.bottomCenter,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                //left side
-                CircleAvatar(
-                  backgroundColor: Colors.black.withOpacity(0.5),
-                  radius: 25,
-                  child: IconButton(
-                      onPressed: () {},
-                      icon: Icon(
-                        Icons.volume_off,
-                        color: kwhite,
-                      )),
+    return InkWell(
+      splashFactory: NoSplash.splashFactory,
+      splashColor: Colors.transparent,
+      onTap: () {
+        setState(() {
+          _controller.value.isPlaying
+              ? _controller.pause()
+              : _controller.play();
+        });
+      },
+      child: Stack(children: [
+        _controller.value.isInitialized
+            ? AspectRatio(
+                aspectRatio: _controller.value.aspectRatio,
+                child: VideoPlayer(
+                  _controller,
                 ),
-
-                // right side
-
+              )
+            : const Center(child: CircularProgressIndicator()),
+        Positioned(
+          bottom: 10,
+          left: 10,
+          right: 15,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.black.withOpacity(0.35),
+                  radius: 30,
+                  child: ValueListenableBuilder(
+                      valueListenable: muteChangeNotifier,
+                      builder: (context, value, _) {
+                        return IconButton(
+                            splashColor: Colors.transparent,
+                            color: Colors.white,
+                            onPressed: () {
+                              updateMute(value);
+                            },
+                            icon: Icon(value
+                                ? CupertinoIcons.volume_down
+                                : CupertinoIcons.volume_off));
+                      }),
+                ),
                 Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
                       child: CircleAvatar(
-                        radius: 28,
-                        backgroundImage: NetworkImage(
-                          "https://www.themoviedb.org/t/p/w220_and_h330_face/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
-                        ),
+                        radius: 34,
+                        backgroundImage:
+                            NetworkImage("$imagePath${widget.imageUrl}"),
                       ),
                     ),
-                    videoActionsWidget(
-                        icon: Icons.emoji_emotions, title: 'LOL'),
-                    videoActionsWidget(icon: Icons.add, title: 'My List'),
-                    videoActionsWidget(icon: Icons.share, title: 'Share'),
-                    videoActionsWidget(icon: Icons.play_arrow, title: 'Play'),
+                    const VideoActionsWidget(
+                        icon: Icons.emoji_emotions, title: "LOL"),
+                    const VideoActionsWidget(icon: Icons.add, title: "My List"),
+                    const VideoActionsWidget(icon: Icons.share, title: "Share"),
+                    InkWell(
+                      splashFactory: NoSplash.splashFactory,
+                      onTap: () {
+                        setState(() {
+                          _controller.value.isPlaying
+                              ? _controller.pause()
+                              : _controller.play();
+                        });
+                      },
+                      child: VideoActionsWidget(
+                        icon: _controller.value.isPlaying
+                            ? Icons.pause
+                            : Icons.play_arrow,
+                        title: "Play",
+                      ),
+                    ),
                   ],
                 )
-              ],
-            ),
-          ),
-        )
-      ],
+              ]),
+        ),
+      ]),
     );
   }
 }
 
-class videoActionsWidget extends StatelessWidget {
+class VideoActionsWidget extends StatelessWidget {
+  const VideoActionsWidget({
+    super.key,
+    required this.icon,
+    required this.title,
+  });
   final IconData icon;
   final String title;
-  const videoActionsWidget(
-      {super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+      padding: const EdgeInsets.symmetric(vertical: 15),
       child: Column(
         children: [
           Icon(
             icon,
-            color: Colors.white,
-            shadows: [
-              BoxShadow(
-                color: Colors.grey[800]!,
-                blurRadius: 10,
-                offset: Offset(3, 3),
-              )
-            ],
+            color: kwhite,
+            size: 30,
           ),
           Text(
             title,
-            style: const TextStyle(color: kwhite, fontSize: 15),
+            style: const TextStyle(color: kwhite),
           ),
         ],
       ),
     );
+  }
+}
+
+void updateMute(bool value) {
+  if (value) {
+    muteChangeNotifier.value = false;
+  } else {
+    muteChangeNotifier.value = true;
   }
 }
