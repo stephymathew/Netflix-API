@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:netflix_api/controller/api/api.dart';
 import 'package:netflix_api/core/colors/constants.dart';
 import 'package:netflix_api/view/presentation/widgets/app_bar_widget.dart';
 
@@ -34,12 +35,7 @@ class ScreenDownloads extends StatelessWidget {
 class Section2 extends StatelessWidget {
   Section2({super.key});
 
-  final List imageList = [
-    "https://www.themoviedb.org/t/p/w220_and_h330_face/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
-    "https://www.themoviedb.org/t/p/w220_and_h330_face/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
-    "https://www.themoviedb.org/t/p/w220_and_h330_face/rjkmN1dniUHVYAtwuV3Tji7FsDO.jpg",
-  ];
-
+  
   @override
   Widget build(BuildContext context) {
     final Size size = MediaQuery.of(context).size;
@@ -58,7 +54,30 @@ class Section2 extends StatelessWidget {
           style: TextStyle(color: Colors.grey, fontSize: 16),
         ),
         kheight,
-        SizedBox(
+        FutureBuilder<List<String?>>(
+          future: Api().getDownloadImageUrls(),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting ||
+                snapshot.connectionState == ConnectionState.none) {
+              return Center(
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey[800],
+                  radius: size.width * 0.395,
+                  child: const CircularProgressIndicator(),
+                ),
+              );
+            } else if (snapshot.hasError) {
+              return Center(
+                child: CircleAvatar(
+                  backgroundColor: Colors.grey[800],
+                  radius: size.width * 0.395,
+                  child: const CircularProgressIndicator(),
+                ),
+              );
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return const Text('No data available');
+            } else {
+          return SizedBox(
           width: size.width,
           height: size.width,
           child: Stack(
@@ -69,22 +88,26 @@ class Section2 extends StatelessWidget {
                 backgroundColor: Colors.grey.withOpacity(0.5),
               ),
               downloadsImageWidget(
-                  imageList: imageList[2],
+                  imageList: snapshot.data![0],
                   margin: EdgeInsets.only(left: 140, bottom: 50, top: 40),
                   angle: 25,
                   size: Size(size.width * 0.4, size.width * 0.58)),
               downloadsImageWidget(
-                imageList: imageList[1],
+                imageList: snapshot.data![1],
                 margin: EdgeInsets.only(right: 140, bottom: 50, top: 30),
                 angle: -25,
                 size: Size(size.width * 0.4, size.width * 0.58),
               ),
               downloadsImageWidget(
-                  imageList: imageList[0],
+                  imageList: snapshot.data![2],
                   margin: EdgeInsets.only(bottom: 10, top: 30),
                   size: Size(size.width * 0.45, size.width * 0.65)),
-            ],
-          ),
+    
+                  ],
+                ),
+              );
+            }
+          },
         ),
       ],
     );
@@ -165,7 +188,7 @@ class downloadsImageWidget extends StatelessWidget {
     this.radius = 10,
   });
 
-  final String imageList;
+  final String? imageList;
   final double angle;
   final EdgeInsets margin;
   final Size size;
@@ -182,7 +205,7 @@ class downloadsImageWidget extends StatelessWidget {
         decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(radius),
             image: DecorationImage(
-                fit: BoxFit.cover, image: NetworkImage(imageList))),
+                fit: BoxFit.cover, image: NetworkImage("$imagePath$imageList"))),
       ),
     );
   }
