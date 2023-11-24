@@ -33,11 +33,11 @@ dependencies:
   flutter:
     sdk: flutter
   google_fonts: ^6.1.0
-  http: 
-  video_player: ^2.8.1
+  http: null
+  intl: ^0.18.1
   json_annotation: ^4.8.1
   json_serializable: ^6.7.1
-
+  video_player: ^2.8.1
 
 dev_dependencies:
   build_runner: ^2.4.6

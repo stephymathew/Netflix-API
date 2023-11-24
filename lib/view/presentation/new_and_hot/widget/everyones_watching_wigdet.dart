@@ -1,34 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_api/core/colors/constants.dart';
+import 'package:netflix_api/model/movies/movie/movie.dart';
 import 'package:netflix_api/view/presentation/home/widget/custom_button_widget.dart';
 import 'package:netflix_api/view/presentation/widgets/video_widget.dart';
 
 class EveryOnesWatchingWidget extends StatelessWidget {
   const EveryOnesWatchingWidget({
-    super.key,
+    super.key, required this.movie,
   });
+  final Movie movie;
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
+    return  Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         kheight,
         Text(
-          'Narnia',
+          '${movie.title}',
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
         ),
         kheight,
         Text(
-          'Siblings Lucy, Edmund, Susan and Peter step through a magical wardrobe and find the land of Narnia. There, they discover a charming, once peaceful kingdom that has been plunged into eternal winter by the evil White Witch, Jadis.  ',
+          '${movie.overview}' ,
           style: TextStyle(color: Colors.grey),
         ),
         kheight50,
         VideoWidget(
-          image: everyonewatchingimg,
+          image: movie.posterPath,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
