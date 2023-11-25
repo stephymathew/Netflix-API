@@ -1,159 +1,107 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:netflix_api/core/colors/constants.dart';
-import 'package:video_player/video_player.dart';
+import 'package:netflix_api/model/movies/movie/movie.dart';
 
-ValueNotifier<bool> muteChangeNotifier = ValueNotifier(false);
 
-class VideoListItem extends StatefulWidget {
-  final String? imageUrl;
-  final String? videoUrl;
-  const VideoListItem(
-      {super.key, required this.imageUrl, required this.videoUrl});
-
-  @override
-  State<VideoListItem> createState() => _VideoListItemState();
-}
-
-class _VideoListItemState extends State<VideoListItem> {
-  late VideoPlayerController _controller;
-  bool isPlay = true;
-  @override
-  void initState() {
-    super.initState();
-    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl!))
-      ..initialize().then((_) {
-        setState(() {
-          _controller.play();
-        });
-      });
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+class VideoListItem extends StatelessWidget {
+  final int index;
+  final Movie movie;
+  const VideoListItem({super.key, required this.index, required this.movie,});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      splashFactory: NoSplash.splashFactory,
-      splashColor: Colors.transparent,
-      onTap: () {
-        setState(() {
-          _controller.value.isPlaying
-              ? _controller.pause()
-              : _controller.play();
-        });
-      },
-      child: Stack(children: [
-        _controller.value.isInitialized
-            ? AspectRatio(
-                aspectRatio: _controller.value.aspectRatio,
-                child: VideoPlayer(
-                  _controller,
-                ),
-              )
-            : const Center(child: CircularProgressIndicator()),
-        Positioned(
-          bottom: 10,
-          left: 10,
-          right: 15,
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Stack(
+      children: [
+        Container(
+            decoration: BoxDecoration(
+                image: DecorationImage(
+                    image: NetworkImage(
+                     '$imagePath${movie.posterPath!}',
+                    ),
+                    fit: BoxFit.cover))),
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CircleAvatar(
-                  backgroundColor: Colors.black.withOpacity(0.35),
-                  radius: 30,
-                  child: ValueListenableBuilder(
-                      valueListenable: muteChangeNotifier,
-                      builder: (context, value, _) {
-                        return IconButton(
-                            splashColor: Colors.transparent,
-                            color: Colors.white,
-                            onPressed: () {
-                              updateMute(value);
-                            },
-                            icon: Icon(value
-                                ? CupertinoIcons.volume_down
-                                : CupertinoIcons.volume_off));
-                      }),
+                  radius: 27,
+                  backgroundColor: Colors.grey[700],
+                  child: IconButton(
+                    onPressed: () {},
+                    icon: const Icon(
+                      Icons.volume_off,
+                      size: 30,
+                      color: kwhite,
+                    ),
+                  ),
                 ),
-                Column(
+                const Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      padding: EdgeInsets.symmetric(vertical: 20),
                       child: CircleAvatar(
-                        radius: 34,
-                        backgroundImage:
-                            NetworkImage("$imagePath${widget.imageUrl}"),
+                        backgroundImage: NetworkImage(
+                            'https://www.themoviedb.org/t/p/w500_and_h282_face/ucFj56P5fXnutVG2HWyDTIQLwVX.jpg'),
+                        radius: 29,
                       ),
                     ),
-                    const VideoActionsWidget(
-                        icon: Icons.emoji_emotions, title: "LOL"),
-                    const VideoActionsWidget(icon: Icons.add, title: "My List"),
-                    const VideoActionsWidget(icon: Icons.share, title: "Share"),
-                    InkWell(
-                      splashFactory: NoSplash.splashFactory,
-                      onTap: () {
-                        setState(() {
-                          _controller.value.isPlaying
-                              ? _controller.pause()
-                              : _controller.play();
-                        });
-                      },
-                      child: VideoActionsWidget(
-                        icon: _controller.value.isPlaying
-                            ? Icons.pause
-                            : Icons.play_arrow,
-                        title: "Play",
-                      ),
-                    ),
+                    // kHeight20,
+                    VideoActionWidget(
+                        icon: Icons.emoji_emotions_sharp, title: 'LOL'),
+
+                    VideoActionWidget(icon: Icons.add, title: 'My List'),
+
+                    VideoActionWidget(
+                        icon: Icons.share_rounded, title: 'Share'),
+
+                    VideoActionWidget(icon: Icons.play_arrow, title: 'Play'),
                   ],
                 )
-              ]),
+              ],
+            ),
+          ),
         ),
-      ]),
+      ],
     );
   }
 }
 
-class VideoActionsWidget extends StatelessWidget {
-  const VideoActionsWidget({
-    super.key,
-    required this.icon,
-    required this.title,
-  });
+class VideoActionWidget extends StatelessWidget {
   final IconData icon;
   final String title;
+  const VideoActionWidget({super.key, required this.icon, required this.title});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 15),
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
       child: Column(
         children: [
           Icon(
             icon,
             color: kwhite,
             size: 30,
+            
+            shadows: const [
+              Shadow(
+                  offset: Offset(
+                    0.90,
+                    0.70,
+                  ),
+                  blurRadius: 9.2)
+            ],
           ),
           Text(
             title,
-            style: const TextStyle(color: kwhite),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
     );
-  }
-}
-
-void updateMute(bool value) {
-  if (value) {
-    muteChangeNotifier.value = false;
-  } else {
-    muteChangeNotifier.value = true;
   }
 }

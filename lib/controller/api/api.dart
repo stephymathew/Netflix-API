@@ -92,15 +92,19 @@ class Api {
     }
   }
 
-  static const fastLaugh ="https://run.mocky.io/v3/e5b9ed99-e74a-4a1f-a624-aad618c77a85";
+  static const fastLaugh ="https://run.mocky.io/v3/23fd5bde-1748-4a5d-98c3-5513fb8bdca0";
 
   Future<List<String>> getFastLaughVideoUrls() async {
     final response = await http.get(Uri.parse(fastLaugh));
-    if (response.statusCode == 200) {
+   
+       if (response.statusCode == 200) {
       final responseData = jsonDecode(response.body)["videoUrls"] as List;
       return responseData.map((videoUrl) => videoUrl as String).toList();
-    } else {
+    } 
+  
+    else {
       throw Exception('something went wrong');
+     
     }
   }
 }
